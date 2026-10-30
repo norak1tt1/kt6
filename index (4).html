@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кото-Центр Latte Art — Промо</title>
+    <style>
+        :root {
+            --bg-main: #fcf8f2;       
+            --bg-card: #f3e9dc;      
+            --bg-dark: #e6ccb2;  
+            --coffee-deep: #7f5539;  
+            --coffee-dark: #5c3d2e; 
+            --cream: #b7b7a4;  
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--coffee-deep);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
+        }
+
+        nav {
+            padding: 20px;
+            background: var(--bg-card);
+            box-shadow: 0 4px 15px rgba(92, 61, 46, 0.08);
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            position: relative;
+            z-index: 100;
+        }
+
+        nav a {
+            color: var(--coffee-deep);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 5px 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        nav a.active, nav a:hover {
+            color: var(--bg-main);
+            background-color: var(--coffee-deep);
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .page.active-page {
+            display: block; 
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        kbd {
+            background: var(--coffee-deep);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        #main-page {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: var(--coffee-dark);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.1s ease, font-size 0.2s ease, color 0.2s;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .cursor-glow {
+            position: fixed;
+            pointer-events: none;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(230, 204, 178, 0.4) 0%, rgba(252, 248, 242, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .catalog-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 3px solid transparent;
+            border-radius: 15px;
+            width: 260px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 20px rgba(92, 61, 46, 0.05);
+            transition: transform 0.3s ease, border-color 0.3s, box-shadow 0.3s;
+            transform-style: preserve-3d;
+        }
+
+        .card.selected {
+            border-color: var(--coffee-deep);
+            box-shadow: 0 15px 30px rgba(92, 61, 46, 0.15);
+            transform: translateY(-15px);
+        }
+
+        .card h3 {
+            color: var(--coffee-dark);
+            font-size: 1.5rem;
+            margin: 15px 0 10px 0;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .emoji-icon {
+            font-size: 4.5rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            background: var(--coffee-deep);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: var(--coffee-dark);
+        }
+
+        .btn-gif { background: #b1a7a6; color: #fff; }
+        .btn-gif:hover { background: #666; }
+        
+        .btn-say { background: #ddb892; color: var(--coffee-dark); }
+        .btn-say:hover { background: #cdb4db; }
+
+        .display-area {
+            min-height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-card);
+            border: 3px dashed var(--coffee-deep);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+        }
+
+        .cat-img {
+            max-width: 95%;
+            max-height: 500px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 10px 25px rgba(92, 61, 46, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .cat-img:hover {
+            transform: scale(1.04) rotate(1deg);
+            box-shadow: 0 15px 35px rgba(92, 61, 46, 0.25);
+            cursor: zoom-in;
+        }
+
+        #loader {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--coffee-deep);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#main" class="nav-link active" data-target="main-page">Главная</a>
+        <a href="#catalog" class="nav-link" data-target="catalog-page">Каталог фракций</a>
+        <a href="#generator" class="nav-link" data-target="generator-page">Генератор API</a>
+    </nav>
+
+    <div id="main-page" class="page active-page">
+        <div class="cursor-glow" id="glow"></div>
+        <div class="container hero">
+            <h1 id="main-title">КОФЕЙНЫЙ УГОЛОК КОТИКОВ</h1>
+            <p>Добро пожаловать! Двигайте мышь, чтобы плавно подсвечивать теплые оттенки латте. Зажмите клавиши <kbd>+</kbd> или <kbd>-</kbd> на клавиатуре, чтобы управлять размером этого текста.</p>
+        </div>
+    </div>
+
+    <div id="catalog-page" class="page">
+        <div class="container">
+            <h2>Каталог Кото-Фракций</h2>
+            <p>Используйте стрелочки клавиатуры <kbd>←</kbd> и <kbd>→</kbd> для выбора фракции. Наведите курсор мыши на карточку, чтобы ощутить 3D-наклон.</p>
+            
+            <div class="catalog-grid">
+                <div class="card selected" data-index="0">
+                    <div class="emoji-icon">☕</div>
+                    <h3>Капучино-Сони</h3>
+                    <p>Котики, дремлющие на мягкой молочной пенке до обеда.</p>
+                </div>
+                <div class="card" data-index="1">
+                    <div class="emoji-icon">🍪</div>
+                    <h3>Имбирные Воины</h3>
+                    <p>Заряженные бодростью кошачьи бои</p>
+                </div>
+                <div class="card" data-index="2">
+                    <div class="emoji-icon">☕</div>
+                    <h3>Эспрессо-Скакуны</h3>
+                    <p>Активные коты, устраивающие тыгыдык.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="generator-page" class="page">
+        <div class="container">
+            <h2>Прямое подключение к Cataas API</h2>
+            <p>Нажимайте на кнопки мышкой или используйте горячие клавиши: <kbd>C</kbd> (Обычный), <kbd>G</kbd> (Гифка), <kbd>S</kbd> (С надписью)</p>
+            
+            <div class="controls">
+                <button class="btn" id="cat-btn">Случайный котейка</button>
+                <button class="btn btn-gif" id="gif-btn">Гиф-котэ</button>
+                <button class="btn btn-say" id="say-btn">Котейка с надписью</button>
+            </div>
+
+            <div class="display-area">
+                <div id="loader">Загрузка котика с сервера cataas.com...</div>
+                <img src="" alt="Живой котик из API" id="cat-target" class="cat-img">
+            </div>
+        </div>
+    </div>
+
+    <script>
+const navLinks = document.querySelectorAll('.nav-link');
+const pages = document.querySelectorAll('.page');
+let currentPageId = 'main-page';
+
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        const targetPageId = link.getAttribute('data-target');
+        currentPageId = targetPageId;
+
+        pages.forEach(page => page.classList.remove('active-page'));
+        document.getElementById(targetPageId).classList.add('active-page');
+
+        if (targetPageId === 'generator-page' && !document.getElementById('cat-target').src) {
+            triggerCataasApi('/cat');
+        }
+    });
+});
+
+const glow = document.getElementById('glow');
+const mainTitle = document.getElementById('main-title');
+let currentSize = 3.5;
+
+window.addEventListener('mousemove', (e) => {
+    if (currentPageId === 'main-page') {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+    }
+});
+
+const cards = document.querySelectorAll('.card');
+let activeCatalogIdx = 0;
+
+cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        if (currentPageId !== 'catalog-page') return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `rotateY(${x / 10}deg) rotateX(${-y / 10}deg) translateY(${card.classList.contains('selected') ? '-15px' : '0px'})`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = card.classList.contains('selected') ? 'translateY(-15px)' : 'none';
+    });
+});
+
+
+const catTarget = document.getElementById('cat-target');
+const loader = document.getElementById('loader');
+const catBtn = document.getElementById('cat-btn');
+const gifBtn = document.getElementById('gif-btn');
+const sayBtn = document.getElementById('say-btn');
+
+function triggerCataasApi(endpoint) {
+    loader.style.display = 'block';
+    catTarget.style.display = 'none';
+    loader.innerText = 'Немного подождите, кофейный экспресс везет котика...';
+
+    const uniqueStamp = `coffee_v2_${Date.now()}`;
+    const separator = endpoint.includes('?') ? '&' : '?';
+    
+    catTarget.src = `https://cataas.com${endpoint}${separator}nocache=${uniqueStamp}`;
+}
+
+catTarget.onload = () => {
+    loader.style.display = 'none';
+    catTarget.style.display = 'block';
+};
+
+catTarget.onerror = () => {
+    loader.innerText = '⚠️ Сервер Cataas занят варкой кофе. Попробуйте еще раз через секунду!';
+};
+
+catBtn.addEventListener('click', () => triggerCataasApi('/cat'));
+gifBtn.addEventListener('click', () => triggerCataasApi('/cat/gif'));
+sayBtn.addEventListener('click', () => triggerCataasApi('/cat/says/МЯЯЯЯУ'));
+
+window.addEventListener('keydown', (e) => {
+    const key = e.key.toUpperCase();
+
+    if (currentPageId === 'main-page') {
+        if (e.key === '+' || e.key === '=') {
+            currentSize = Math.min(5, currentSize + 0.15);
+            mainTitle.style.fontSize = currentSize + 'rem';
+            mainTitle.style.color = 'var(--coffee-dark)';
+        }
+        if (e.key === '-') {
+            currentSize = Math.max(2, currentSize - 0.15);
+            mainTitle.style.fontSize = currentSize + 'rem';
+            mainTitle.style.color = '#b7b7a4';
+        }
+    }
+
+    if (currentPageId === 'catalog-page') {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            cards[activeCatalogIdx].classList.remove('selected');
+            cards[activeCatalogIdx].style.transform = 'none';
+
+            if (e.key === 'ArrowRight') {
+                activeCatalogIdx = (activeCatalogIdx + 1) % cards.length;
+            } else if (e.key === 'ArrowLeft') {
+                activeCatalogIdx = (activeCatalogIdx - 1 + cards.length) % cards.length;
+            }
+
+            cards[activeCatalogIdx].classList.add('selected');
+            cards[activeCatalogIdx].style.transform = 'translateY(-15px)';
+        }
+    }
+
+    if (currentPageId === 'generator-page') {
+        if (key === 'C' || e.code === 'KeyC') {
+            catBtn.style.transform = 'scale(0.95)'; 
+            triggerCataasApi('/cat');
+        }
+        if (key === 'G' || e.code === 'KeyG') {
+            gifBtn.style.transform = 'scale(0.95)';
+            triggerCataasApi('/cat/gif');
+        }
+        if (key === 'S' || e.code === 'KeyS') {
+            sayBtn.style.transform = 'scale(0.95)';
+            triggerCataasApi('/cat/says/Latte Art');
+        }
+    }
+});
+
+window.addEventListener('keyup', () => {
+    if (mainTitle) mainTitle.style.color = 'var(--coffee-dark)';
+    if (catBtn) catBtn.style.transform = 'none';
+    if (gifBtn) gifBtn.style.transform = 'none';
+    if (sayBtn) sayBtn.style.transform = 'none';
+});
+     </script>
+</body>
+</html>
